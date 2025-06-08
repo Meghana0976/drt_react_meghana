@@ -7,6 +7,7 @@ import Filters from './Filters';
 import SatelliteTable from './SatelliteTable';
 import PaginationControls from './PaginationControls';
 import Header from './Header';
+import SortControls from '../components/Sorting';
 
 const containerStyle: React.CSSProperties = {
   width: '100%',
@@ -35,6 +36,10 @@ const SatelliteDashboard = () => {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  // Sorting state
+  const [sortBy, setSortBy] = useState<'name' | 'noradCatId'>('name');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   const navigate = useNavigate();
 
@@ -73,14 +78,34 @@ const SatelliteDashboard = () => {
     loadData();
   }, []);
 
+  // Filter and sort the satellites list
   const filtered = useMemo(() => {
-    return satellites.filter(
+    const filteredData = satellites.filter(
       (sat) =>
         (sat.name || '').toLowerCase().includes(searchName.toLowerCase()) &&
         (objectFilter.length === 0 || objectFilter.includes(sat.objectType ?? '')) &&
         (orbitFilter.length === 0 || orbitFilter.includes(sat.orbitCode ?? ''))
     );
-  }, [satellites, searchName, objectFilter, orbitFilter]);
+
+    // Sort filtered data
+    const sortedData = [...filteredData].sort((a, b) => {
+      const valA = a[sortBy];
+      const valB = b[sortBy];
+      if (valA === undefined || valB === undefined) return 0;
+
+      if (typeof valA === 'string' && typeof valB === 'string') {
+        return sortOrder === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+      }
+
+      if (typeof valA === 'number' && typeof valB === 'number') {
+        return sortOrder === 'asc' ? valA - valB : valB - valA;
+      }
+
+      return 0;
+    });
+
+    return sortedData;
+  }, [satellites, searchName, objectFilter, orbitFilter, sortBy, sortOrder]);
 
   const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
@@ -90,7 +115,6 @@ const SatelliteDashboard = () => {
 
   const getCount = (key: keyof Satellite, value: string) =>
     satellites.filter((s) => s[key] === value).length;
-
 
   if (loading) {
     return (
@@ -129,7 +153,6 @@ const SatelliteDashboard = () => {
     );
   }
 
-
   return (
     <div style={containerStyle}>
       <Header />
@@ -152,9 +175,6 @@ const SatelliteDashboard = () => {
             setCurrentPage(1);
           }}
         />
-        {/* <p style={{ margin: 0 }}>
-          Showing {filtered.length} result{filtered.length !== 1 ? 's' : ''}
-        </p> */}
       </div>
 
       <div style={{ marginTop: '20px', textAlign: 'center' }}>
@@ -197,6 +217,13 @@ const SatelliteDashboard = () => {
           setCurrentPage(1);
         }}
         getCount={getCount}
+      />
+
+      <SortControls
+        sortBy={sortBy}
+        sortOrder={sortOrder}
+        onSortByChange={setSortBy}
+        onSortOrderChange={setSortOrder}
       />
 
       <SatelliteTable
