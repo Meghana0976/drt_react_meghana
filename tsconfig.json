@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES6",                         // Output JS version
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],  // Libraries to include
+    "allowJs": true,                        // Allows compiling JS files (optional)
+    "skipLibCheck": true,                   // Skip type checking of declaration files
+    "esModuleInterop": true,                // For module compatibility
+    "allowSyntheticDefaultImports": true,  // Allow default imports from modules without default export
+    "strict": true,                         // Enable all strict type-checking options
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",                     // Module code generation
+    "moduleResolution": "Node",             // Module resolution strategy
+    "resolveJsonModule": true,              // Allows importing JSON files
+    "isolatedModules": true,                 // Each file is treated as a separate module
+    "noEmit": true,                         // Don't output compiled files (CRA handles this)
+    "jsx": "react-jsx"                      // JSX code generation for React 17+
+  },
+  "include": ["src"]                        // Folder(s) to include
+}
