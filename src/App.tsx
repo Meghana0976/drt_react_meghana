@@ -1,10 +1,12 @@
 import { Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
+import SatelliteDashboard from './components/SatelliteDashboard';
+import SelectedSatellites from './pages/SelectedSatellite';
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<SatelliteDashboard />} />
+      <Route path="/selected" element={<SelectedSatellites />} />
     </Routes>
   );
 }

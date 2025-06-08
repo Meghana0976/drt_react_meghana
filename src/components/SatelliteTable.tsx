@@ -1,32 +1,30 @@
-import React from 'react';
+import React, { useState, CSSProperties } from 'react';
+import { FixedSizeList as List } from 'react-window';
 import { Satellite } from '../types/Satellite';
 
 interface Props {
   data: Satellite[];
+  selectedRows: Satellite[];
+  setSelectedRows: React.Dispatch<React.SetStateAction<Satellite[]>>;
 }
 
-const tableStyle: React.CSSProperties = {
-  width: '100%',
-  borderCollapse: 'collapse',
-  background: '#fff',
-  boxShadow: '0 2px 6px rgba(0,0,0,0.05)',
-  borderRadius: '10px',
-};
+type SortField = 'name' | 'noradCatId';
+type SortOrder = 'asc' | 'desc';
 
-const thStyle: React.CSSProperties = {
-  padding: '12px 16px',
-  textAlign: 'left',
+const headerStyle: CSSProperties = {
+  display: 'flex',
+  fontWeight: 'bold',
   backgroundColor: '#eef0ff',
-  fontWeight: 600,
+  padding: '10px',
 };
 
-const tdStyle: React.CSSProperties = {
-  padding: '12px 16px',
-  fontSize: '14px',
+const cellStyle: CSSProperties = {
+  flex: 1,
+  padding: '10px',
   borderBottom: '1px solid #eee',
 };
 
-const badge = (text: string, color: string) => ({
+const badgeStyle = (color: string): CSSProperties => ({
   backgroundColor: color,
   color: '#fff',
   padding: '4px 8px',
@@ -35,52 +33,110 @@ const badge = (text: string, color: string) => ({
   display: 'inline-block',
 });
 
-const SatelliteTable = ({ data }: Props) => {
+const SatelliteTable: React.FC<Props> = ({ data, selectedRows, setSelectedRows }) => {
+  const [error, setError] = useState('');
+  const [sortField, setSortField] = useState<SortField>('name');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+
+  const toggleSelection = (sat: Satellite) => {
+    const isSelected = selectedRows.some((s) => s.noradCatId === sat.noradCatId);
+    if (isSelected) {
+      setSelectedRows(selectedRows.filter((s) => s.noradCatId !== sat.noradCatId));
+      setError('');
+    } else {
+      if (selectedRows.length >= 10) {
+        setError('⚠️ You can only select up to 10 satellites.');
+        return;
+      }
+      setSelectedRows([...selectedRows, sat]);
+      setError('');
+    }
+  };
+
+  const isSelected = (sat: Satellite) =>
+    selectedRows.some((s) => s.noradCatId === sat.noradCatId);
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortOrder('asc');
+    }
+  };
+
+  const sortedData = [...data].sort((a, b) => {
+    const valA = a[sortField]?.toString().toLowerCase() || '';
+    const valB = b[sortField]?.toString().toLowerCase() || '';
+    if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+    if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  const Row = ({ index, style }: { index: number; style: CSSProperties }) => {
+    const sat = sortedData[index];
+    return (
+      <div style={{ ...style, display: 'flex', alignItems: 'center', background: isSelected(sat) ? '#e0f7ff' : 'white' }}>
+        <div style={{ ...cellStyle, flex: '0 0 60px' }}>
+          <input type="checkbox" checked={isSelected(sat)} onChange={() => toggleSelection(sat)} />
+        </div>
+        <div style={cellStyle}>{sat.name || 'N/A'}</div>
+        <div style={cellStyle}>{sat.noradCatId || 'N/A'}</div>
+        <div style={cellStyle}>{sat.intlDes || 'N/A'}</div>
+        <div style={cellStyle}>{sat.launchDate || 'N/A'}</div>
+        <div style={cellStyle}>{sat.decayDate || 'N/A'}</div>
+        <div style={cellStyle}>
+          <span style={badgeStyle('#60a5fa')}>{sat.objectType || 'N/A'}</span>
+        </div>
+        <div style={cellStyle}>{sat.launchSiteCode || 'N/A'}</div>
+        <div style={cellStyle}>{sat.countryCode || 'N/A'}</div>
+        <div style={cellStyle}>
+          <span style={badgeStyle('#a78bfa')}>{sat.orbitCode || 'N/A'}</span>
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <table style={tableStyle}>
-      <thead>
-        <tr>
-          <th style={thStyle}>Name</th>
-          <th style={thStyle}>NORAD ID</th>
-          <th style={thStyle}>Designator</th>
-          <th style={thStyle}>Launch Date</th>
-          <th style={thStyle}>Decay Date</th>
-          <th style={thStyle}>Object Type</th>
-          <th style={thStyle}>Launch Site</th>
-          <th style={thStyle}>Country</th>
-          <th style={thStyle}>Orbit</th>
-        </tr>
-      </thead>
-      <tbody>
-        {data.length === 0 ? (
-          <tr>
-            <td style={tdStyle} colSpan={9}>No satellites found.</td>
-          </tr>
-        ) : (
-          data.map((sat) => (
-            <tr key={sat.noradCatId}>
-              <td style={tdStyle}>{sat.name || 'N/A'}</td>
-              <td style={tdStyle}>{sat.noradCatId || 'N/A'}</td>
-              <td style={tdStyle}>{sat.intlDes || 'N/A'}</td>
-              <td style={tdStyle}>{sat.launchDate || 'N/A'}</td>
-              <td style={tdStyle}>{sat.decayDate || 'N/A'}</td>
-              <td style={tdStyle}>
-                <span style={badge(sat.objectType || 'N/A', '#60a5fa')}>
-                  {sat.objectType || 'N/A'}
-                </span>
-              </td>
-              <td style={tdStyle}>{sat.launchSiteCode || 'N/A'}</td>
-              <td style={tdStyle}>{sat.countryCode || 'N/A'}</td>
-              <td style={tdStyle}>
-                <span style={badge(sat.orbitCode || 'N/A', '#a78bfa')}>
-                  {sat.orbitCode || 'N/A'}
-                </span>
-              </td>
-            </tr>
-          ))
-        )}
-      </tbody>
-    </table>
+    <div style={{ marginTop: '20px' }}>
+      <p style={{ textAlign: 'center', fontWeight: 'bold', marginBottom: '8px' }}>
+        Selected Satellites: {selectedRows.length} / 10
+      </p>
+
+      {error && (
+        <div style={{ color: 'red', textAlign: 'center', marginBottom: '12px', fontWeight: 'bold' }}>
+          {error}
+        </div>
+      )}
+
+      {/* Table Header */}
+      <div style={headerStyle}>
+        <div style={{ ...cellStyle, flex: '0 0 60px' }}>Select</div>
+        <div style={cellStyle} onClick={() => handleSort('name')}>
+          Name {sortField === 'name' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+        </div>
+        <div style={cellStyle} onClick={() => handleSort('noradCatId')}>
+          NORAD ID {sortField === 'noradCatId' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+        </div>
+        <div style={cellStyle}>Designator</div>
+        <div style={cellStyle}>Launch Date</div>
+        <div style={cellStyle}>Decay Date</div>
+        <div style={cellStyle}>Object Type</div>
+        <div style={cellStyle}>Launch Site</div>
+        <div style={cellStyle}>Country</div>
+        <div style={cellStyle}>Orbit</div>
+      </div>
+
+      {/* Virtualized Rows */}
+      <List
+        height={500}
+        itemCount={sortedData.length}
+        itemSize={60}
+        width="100%"
+      >
+        {Row}
+      </List>
+    </div>
   );
 };
 

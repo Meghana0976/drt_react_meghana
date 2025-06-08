@@ -7,13 +7,14 @@ interface Props {
 }
 
 const inputStyle: React.CSSProperties = {
-  padding: '8px 12px',
+  padding: '15px 12px',
   marginBottom: '10px',
   marginTop: '10px',
-  width: '100%',
   fontSize: '16px',
   border: '1px solid #ccc',
-  borderRadius: '8px',
+  borderRadius: '10px',
+  width: '30%',
+  fontStyle: 'normal',
 };
 
 const SearchBar = ({ value, onChange, onEnter }: Props) => {
@@ -24,7 +25,7 @@ const SearchBar = ({ value, onChange, onEnter }: Props) => {
   return (
     <input
       type="text"
-      placeholder="Search satellite by name..."
+      placeholder="Search satellite by name or normat Id"
       style={inputStyle}
       value={value}
       onChange={(e) => onChange(e.target.value)}

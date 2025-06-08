@@ -17,7 +17,7 @@ const Home = () => {
         padding: '20px',
            overflow: 'hidden',
         boxSizing: 'border-box',
-        width: '100vw',
+        width: '100%',
       }}
     >
       <Header />

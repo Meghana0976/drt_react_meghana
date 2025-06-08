@@ -6,18 +6,27 @@ interface Props {
   onPageChange: (page: number) => void;
 }
 
-const buttonStyle: React.CSSProperties = {
-  marginRight: '10px',
-  padding: '6px 12px',
-  borderRadius: '20px',
-  border: '1px solid #ccc',
-  background: '#f4f4f4',
+const baseButtonStyle: React.CSSProperties = {
+  width: '36px',
+  height: '36px',
+  margin: '0 4px',
+  borderRadius: '6px',
+  border: 'none',
+  background: '#ffff',
   cursor: 'pointer',
+  fontWeight: 'bold',
+  fontSize: '14px',
+  transition: 'background 0.3s, color 0.3s',
 };
 
 const activeButtonStyle: React.CSSProperties = {
-  backgroundColor: '#dbeafe',
-  borderColor: '#3b82f6',
+  backgroundColor: '#3b82f6',
+  color: 'white',
+};
+
+const disabledButtonStyle: React.CSSProperties = {
+  cursor: 'not-allowed',
+  opacity: 0.5,
 };
 
 const PaginationControls = ({ currentPage, totalPages, onPageChange }: Props) => {
@@ -36,7 +45,7 @@ const PaginationControls = ({ currentPage, totalPages, onPageChange }: Props) =>
         key={i}
         onClick={() => onPageChange(i)}
         style={{
-          ...buttonStyle,
+          ...baseButtonStyle,
           ...(i === currentPage ? activeButtonStyle : {}),
         }}
       >
@@ -46,21 +55,27 @@ const PaginationControls = ({ currentPage, totalPages, onPageChange }: Props) =>
   }
 
   return (
-    <div style={{ marginTop: '20px', textAlign: 'center' }}>
+    <div style={{ marginTop: '20px', textAlign: 'center', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        style={buttonStyle}
+        style={{
+          ...baseButtonStyle,
+          ...(currentPage === 1 ? disabledButtonStyle : {}),
+        }}
       >
-        Prev
+        «
       </button>
       {buttons}
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        style={buttonStyle}
+        style={{
+          ...baseButtonStyle,
+          ...(currentPage === totalPages ? disabledButtonStyle : {}),
+        }}
       >
-        Next
+        »
       </button>
     </div>
   );
