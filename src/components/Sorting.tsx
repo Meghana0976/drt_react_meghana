@@ -1,4 +1,4 @@
-// src/components/SortControls.tsx
+
 import React from 'react';
 
 interface Props {
