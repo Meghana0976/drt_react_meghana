@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Header from '../components/Header';
 import { Satellite } from '../types/Satellite';
-import SeachBar from '../components/SearchBar';
+import SatelliteDashboard from '../components/SatelliteDashboard';
 
 
 const Home = () => {
@@ -9,19 +9,19 @@ const Home = () => {
     <div
       style={{
         display: 'flex',
-        flexDirection: 'column',   // stack header + table vertically
+        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'flex-start',
-        // backgroundColor: '#00001E',
+        backgroundColor: 'linear-gradient(180deg, #C8D1FF 2.75%, #E3E6FF 100%)',
         minHeight: '100vh',
         padding: '20px',
-           overflow: 'hidden', // <-- Prevent scrolling
-        boxSizing: 'border-box', // Ensure padding doesn't cause overflow
-        width: '100vw', // Ensure full width
+           overflow: 'hidden',
+        boxSizing: 'border-box',
+        width: '100vw',
       }}
     >
       <Header />
-      <SeachBar />
+      <SatelliteDashboard />
     </div>
   );
 };

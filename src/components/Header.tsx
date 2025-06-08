@@ -1,10 +1,28 @@
 const Header = () => {
   return (
-    <div>
-      <h1 className="text-3xl font-bold text-gray-800">
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+       
+        textAlign: 'center',
+      }}
+    >
+      <h1
+        style={{
+          fontStyle: 'oblique',
+        }}
+      >
         🛰️ Satellite Tracker – Digantara
       </h1>
-      <p className="text-gray-500 mt-1">
+      <p
+        style={{
+        fontStyle: 'oblique',
+        fontSize: '1.2rem',
+        }}
+      >
         Search and analyze real satellite data
       </p>
     </div>
@@ -12,4 +30,3 @@ const Header = () => {
 };
 
 export default Header;
-

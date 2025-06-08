@@ -1,86 +1,82 @@
-// src/components/Filters.tsx
-import { useState } from 'react';
+import React from 'react';
+import { Satellite } from '../types/Satellite';
 
-interface FiltersProps {
-  onApply: (filters: { objectTypes: string[]; orbitCodes: string[] }) => void;
+interface Props {
+  objectTypes: string[];
+  orbitCodes: string[];
+  selectedObject: string | null;
+  selectedOrbit: string | null;
+  onObjectChange: (val: string | null) => void;
+  onOrbitChange: (val: string | null) => void;
+  applyFilters: () => void;
+  clearFilters: () => void;
+  getCount: (key: keyof Satellite, value: string) => number;
 }
 
-const OBJECT_TYPES = ["ROCKET BODY", "DEBRIS", "UNKNOWN", "PAYLOAD"];
-const ORBIT_CODES = [
-  "LEO", "LEO1", "LEO2", "LEO3", "LEO4", "MEO", "GEO", "HEO", "IGO", "EGO",
-  "NSO", "GTO", "GHO", "HAO", "MGO", "LMO", "UFO", "ESO", "UNKNOWN"
-];
+const inputStyle: React.CSSProperties = {
+  padding: '8px 12px',
+  marginBottom: '10px',
+  fontSize: '16px',
+  border: '1px solid #ccc',
+  borderRadius: '8px',
+};
 
-const Filters = ({ onApply }: FiltersProps) => {
-  const [selectedObjectTypes, setSelectedObjectTypes] = useState<string[]>([]);
-  const [selectedOrbitCodes, setSelectedOrbitCodes] = useState<string[]>([]);
+const selectStyle: React.CSSProperties = {
+  ...inputStyle,
+  width: 'calc(50% - 12px)',
+  marginRight: '10px',
+};
 
-  const toggleSelection = (value: string, list: string[], setter: Function) => {
-    if (list.includes(value)) {
-      setter(list.filter((item) => item !== value));
-    } else {
-      setter([...list, value]);
-    }
-  };
+const buttonStyle: React.CSSProperties = {
+  marginRight: '10px',
+  padding: '6px 12px',
+  borderRadius: '20px',
+  border: '1px solid #ccc',
+  background: '#f4f4f4',
+  cursor: 'pointer',
+};
 
+const Filters = ({
+  objectTypes,
+  orbitCodes,
+  selectedObject,
+  selectedOrbit,
+  onObjectChange,
+  onOrbitChange,
+  applyFilters,
+  clearFilters,
+  getCount,
+}: Props) => {
   return (
-    <div className="bg-gray-50 p-4 rounded-md mb-4 border">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label className="block font-semibold mb-1">Object Types</label>
-          <div className="flex flex-wrap gap-2">
-            {OBJECT_TYPES.map((type) => (
-              <button
-                key={type}
-                className={`px-3 py-1 text-sm rounded-full border ${
-                  selectedObjectTypes.includes(type)
-                    ? "bg-blue-600 text-white"
-                    : "bg-white text-gray-700"
-                }`}
-                onClick={() =>
-                  toggleSelection(type, selectedObjectTypes, setSelectedObjectTypes)
-                }
-                type="button"
-              >
-                {type}
-              </button>
-            ))}
-          </div>
-        </div>
+    <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: '10px' }}>
+      <select
+        style={selectStyle}
+        value={selectedObject ?? ''}
+        onChange={(e) => onObjectChange(e.target.value || null)}
+      >
+        <option value="">Filter by Object Type</option>
+        {objectTypes.map((type) => (
+          <option key={type} value={type}>
+            {type} ({getCount('objectType', type)})
+          </option>
+        ))}
+      </select>
 
-        <div>
-          <label className="block font-semibold mb-1">Orbit Codes</label>
-          <div className="flex flex-wrap gap-2 max-h-[100px] overflow-y-auto">
-            {ORBIT_CODES.map((code) => (
-              <button
-                key={code}
-                className={`px-3 py-1 text-sm rounded-full border ${
-                  selectedOrbitCodes.includes(code)
-                    ? "bg-green-600 text-white"
-                    : "bg-white text-gray-700"
-                }`}
-                onClick={() =>
-                  toggleSelection(code, selectedOrbitCodes, setSelectedOrbitCodes)
-                }
-                type="button"
-              >
-                {code}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
+      <select
+        style={selectStyle}
+        value={selectedOrbit ?? ''}
+        onChange={(e) => onOrbitChange(e.target.value || null)}
+      >
+        <option value="">Filter by Orbit Code</option>
+        {orbitCodes.map((code) => (
+          <option key={code} value={code}>
+            {code} ({getCount('orbitCode', code)})
+          </option>
+        ))}
+      </select>
 
-      <div className="mt-4 text-right">
-        <button
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          onClick={() =>
-            onApply({ objectTypes: selectedObjectTypes, orbitCodes: selectedOrbitCodes })
-          }
-        >
-          Apply Filters
-        </button>
-      </div>
+      <button onClick={applyFilters} style={buttonStyle}>Apply Filters</button>
+      <button onClick={clearFilters} style={buttonStyle}>Clear Filters</button>
     </div>
   );
 };
